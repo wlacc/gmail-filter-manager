@@ -2437,7 +2437,35 @@ function processPropertyForImport(property, filter) {
                 filter.conditions.excludes = parseConditionString(value);
                 console.log(`Excludes条件を設定: `, filter.conditions.excludes);
                 break;
-            // その他のプロパティ処理...（省略）
+            // 添付ファイルあり条件
+            case 'hasAttachment':
+                filter.conditions.hasAttachment = (value === 'true');
+                console.log(`HasAttachment条件を設定: hasAttachment=${filter.conditions.hasAttachment}`);
+                break;
+            // サイズ条件
+            case 'size':
+                if (!filter.conditions.size) {
+                    filter.conditions.size = { operator: 'larger_than', value: null, unit: 's_smb' };
+                }
+                filter.conditions.size.value = parseInt(value, 10);
+                console.log(`Size条件を設定: value=${filter.conditions.size.value}`);
+                break;
+            case 'sizeOperator':
+                if (!filter.conditions.size) {
+                    filter.conditions.size = { operator: 'larger_than', value: null, unit: 's_smb' };
+                }
+                // Gmail形式のオペレータを内部形式に変換
+                filter.conditions.size.operator = (value === 's_sl') ? 'larger_than' : 'smaller_than';
+                console.log(`SizeOperator条件を設定: operator=${filter.conditions.size.operator}`);
+                break;
+            case 'sizeUnit':
+                if (!filter.conditions.size) {
+                    filter.conditions.size = { operator: 'larger_than', value: null, unit: 's_smb' };
+                }
+                filter.conditions.size.unit = value;
+                console.log(`SizeUnit条件を設定: unit=${filter.conditions.size.unit}`);
+                break;
+            // アクションプロパティの処理
             case 'label':
                 filter.actions.applyLabel.enabled = true;
                 filter.actions.applyLabel.labelName = value;
@@ -2448,7 +2476,47 @@ function processPropertyForImport(property, filter) {
                 filter.actions.forward.forwardAddress = value;
                 console.log(`Forward処理を設定: enabled=${filter.actions.forward.enabled}, address=${filter.actions.forward.forwardAddress}`);
                 break;
-            // その他のプロパティ処理（省略）
+            // アーカイブ（受信トレイをスキップ）
+            case 'shouldArchive':
+                filter.actions.skipInbox = (value === 'true');
+                console.log(`Archive処理を設定: skipInbox=${filter.actions.skipInbox}`);
+                break;
+            // 既読にする
+            case 'shouldMarkAsRead':
+                filter.actions.markAsRead = (value === 'true');
+                console.log(`MarkAsRead処理を設定: markAsRead=${filter.actions.markAsRead}`);
+                break;
+            // スターを付ける
+            case 'shouldStar':
+                filter.actions.star = (value === 'true');
+                console.log(`Star処理を設定: star=${filter.actions.star}`);
+                break;
+            // 削除する
+            case 'shouldTrash':
+                filter.actions.delete = (value === 'true');
+                console.log(`Delete処理を設定: delete=${filter.actions.delete}`);
+                break;
+            // 迷惑メールにしない
+            case 'shouldNeverSpam':
+                filter.actions.notSpam = (value === 'true');
+                console.log(`NotSpam処理を設定: notSpam=${filter.actions.notSpam}`);
+                break;
+            // 常に重要
+            case 'shouldAlwaysMarkAsImportant':
+                filter.actions.alwaysImportant = (value === 'true');
+                console.log(`AlwaysImportant処理を設定: alwaysImportant=${filter.actions.alwaysImportant}`);
+                break;
+            // 常に重要でない
+            case 'shouldNeverMarkAsImportant':
+                filter.actions.neverImportant = (value === 'true');
+                console.log(`NeverImportant処理を設定: neverImportant=${filter.actions.neverImportant}`);
+                break;
+            // カテゴリを適用
+            case 'smartLabelToApply':
+                filter.actions.applyCategory.enabled = true;
+                filter.actions.applyCategory.category = value;
+                console.log(`Category処理を設定: enabled=${filter.actions.applyCategory.enabled}, category=${filter.actions.applyCategory.category}`);
+                break;
             default:
                 console.log(`未処理のプロパティ: ${name} = ${value}`);
         }
